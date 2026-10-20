@@ -1,6 +1,7 @@
 set(LIBOMPACCSUPPORT_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/AsyncInfo.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/DiagnosticPrinter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/PluginManager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DeviceImage.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Mapping.cpp
