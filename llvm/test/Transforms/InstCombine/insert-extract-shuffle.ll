@@ -795,7 +795,7 @@ define <4 x i32> @infloop_D151807(<4 x float> %arg) {
 ; CHECK-NEXT:    [[I:%.*]] = shufflevector <4 x float> [[ARG:%.*]], <4 x float> poison, <2 x i32> <i32 2, i32 poison>
 ; CHECK-NEXT:    [[I1:%.*]] = bitcast <2 x float> [[I]] to <2 x i32>
 ; CHECK-NEXT:    [[TMP1:%.*]] = shufflevector <2 x i32> [[I1]], <2 x i32> poison, <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>
-; CHECK-NEXT:    [[I4:%.*]] = shufflevector <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> [[TMP1]], <4 x i32> <i32 4, i32 0, i32 0, i32 0>
+; CHECK-NEXT:    [[I4:%.*]] = shufflevector <4 x i32> [[TMP1]], <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x i32> [[I4]]
 ;
   %i = shufflevector <4 x float> %arg, <4 x float> poison, <2 x i32> <i32 2, i32 poison>
@@ -856,7 +856,7 @@ bb12:
 ; Insert into an integer zero vector
 define <4 x i32> @insert_into_integer_zero_vector(<4 x i32> %vec) {
 ; CHECK-LABEL: @insert_into_integer_zero_vector(
-; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> [[VEC:%.*]], <4 x i32> <i32 4, i32 0, i32 0, i32 0>
+; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x i32> [[VEC:%.*]], <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x i32> [[VECINS]]
 ;
   %vecext = extractelement <4 x i32> %vec, i32 0
@@ -867,7 +867,7 @@ define <4 x i32> @insert_into_integer_zero_vector(<4 x i32> %vec) {
 ; Insert into an float zero vector
 define <4 x float> @insert_into_float_zero_vector(<4 x float> %vec) {
 ; CHECK-LABEL: @insert_into_float_zero_vector(
-; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x float> <float 0.000000e+00, float poison, float poison, float poison>, <4 x float> [[VEC:%.*]], <4 x i32> <i32 4, i32 0, i32 0, i32 0>
+; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x float> [[VEC:%.*]], <4 x float> <float 0.000000e+00, float poison, float poison, float poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x float> [[VECINS]]
 ;
   %vecext = extractelement <4 x float> %vec, i32 0
@@ -878,7 +878,7 @@ define <4 x float> @insert_into_float_zero_vector(<4 x float> %vec) {
 ; Insert into an null ptr vector
 define <4 x ptr> @insert_into_null_ptr_vector(<4 x ptr> %vec) {
 ; CHECK-LABEL: @insert_into_null_ptr_vector(
-; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x ptr> <ptr null, ptr poison, ptr poison, ptr poison>, <4 x ptr> [[VEC:%.*]], <4 x i32> <i32 4, i32 0, i32 0, i32 0>
+; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x ptr> [[VEC:%.*]], <4 x ptr> <ptr null, ptr poison, ptr poison, ptr poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x ptr> [[VECINS]]
 ;
   %vecext = extractelement <4 x ptr> %vec, i32 0
@@ -889,7 +889,7 @@ define <4 x ptr> @insert_into_null_ptr_vector(<4 x ptr> %vec) {
 ; Negative Test - Insert into a zero vector with poison in lane 0
 define <4 x i32> @insert_into_integer_zero_vector_poison(<4 x i32> %vec) {
 ; CHECK-LABEL: @insert_into_integer_zero_vector_poison(
-; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x i32> [[VEC:%.*]], <4 x i32> <i32 poison, i32 0, i32 0, i32 0>, <4 x i32> <i32 0, i32 5, i32 6, i32 7>
+; CHECK-NEXT:    [[VECINS:%.*]] = shufflevector <4 x i32> [[VEC:%.*]], <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x i32> [[VECINS]]
 ;
   %vecext = extractelement <4 x i32> %vec, i32 0

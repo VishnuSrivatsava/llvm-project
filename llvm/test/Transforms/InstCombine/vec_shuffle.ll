@@ -2570,7 +2570,7 @@ exit:
 
 define <4 x i32> @clear_upper_lanes_zero_rhs(<4 x i32> %x) {
 ; CHECK-LABEL: @clear_upper_lanes_zero_rhs(
-; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <4 x i32> [[X:%.*]], <4 x i32> <i32 poison, i32 0, i32 0, i32 0>, <4 x i32> <i32 0, i32 5, i32 6, i32 7>
+; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <4 x i32> [[X:%.*]], <4 x i32> <i32 0, i32 poison, i32 poison, i32 poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x i32> [[SHUF]]
 ;
   %shuf = shufflevector <4 x i32> %x, <4 x i32> zeroinitializer, <4 x i32> <i32 0, i32 5, i32 6, i32 7>
@@ -2579,8 +2579,8 @@ define <4 x i32> @clear_upper_lanes_zero_rhs(<4 x i32> %x) {
 
 define <8 x half> @clear_upper_lanes_zero_lhs(<8 x half> %x) {
 ; CHECK-LABEL: @clear_upper_lanes_zero_lhs(
-; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <8 x i16> <i16 0, i16 0, i16 0, i16 0, i16 0, i16 0, i16 0, i16 poison>, <8 x i16> [[X:%.*]], <8 x i32> <i32 8, i32 0, i32 1, i32 2, i32 3, i32 4, i32 5, i32 6>
-; CHECK-NEXT:    ret <8 x i16> [[SHUF]]
+; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <8 x half> [[X:%.*]], <8 x half> <half 0.000000e+00, half poison, half poison, half poison, half poison, half poison, half poison, half poison>, <8 x i32> <i32 0, i32 8, i32 8, i32 8, i32 8, i32 8, i32 8, i32 8>
+; CHECK-NEXT:    ret <8 x half> [[SHUF]]
 ;
   %shuf = shufflevector <8 x half> zeroinitializer, <8 x half> %x, <8 x i32> <i32 8, i32 0, i32 1, i32 2, i32 3, i32 4, i32 5, i32 6>
   ret <8 x half> %shuf
@@ -2588,7 +2588,7 @@ define <8 x half> @clear_upper_lanes_zero_lhs(<8 x half> %x) {
 
 define <4 x i8> @clear_upper_lanes_zero_poison(<4 x i8> %x) {
 ; CHECK-LABEL: @clear_upper_lanes_zero_poison(
-; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <4 x i8> [[X:%.*]], <4 x i8> <i8 poison, i8 0, i8 0, i8 0>, <4 x i32> <i32 0, i32 5, i32 6, i32 7>
+; CHECK-NEXT:    [[SHUF:%.*]] = shufflevector <4 x i8> [[X:%.*]], <4 x i8> <i8 0, i8 poison, i8 poison, i8 poison>, <4 x i32> <i32 0, i32 4, i32 4, i32 4>
 ; CHECK-NEXT:    ret <4 x i8> [[SHUF]]
 ;
   %shuf = shufflevector <4 x i8> %x, <4 x i8> <i8 poison, i8 0, i8 0, i8 0>, <4 x i32> <i32 0, i32 5, i32 6, i32 7>
