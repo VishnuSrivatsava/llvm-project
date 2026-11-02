@@ -2962,6 +2962,50 @@ static Instruction *foldIdentityPaddedShuffles(ShuffleVectorInst &Shuf) {
   return new ShuffleVectorInst(X, Y, NewMask);
 }
 
+static Instruction *canonicalizeClearUpperLanes(ShuffleVectorInst &SVI) {
+  Value *LHS = SVI.getOperand(0);
+  Value *RHS = SVI.getOperand(1);
+
+  bool LHSZero = match(LHS, m_CombineOr(m_Zero(), m_PosZeroFP()));
+  if (LHSZero == match(RHS, m_CombineOr(m_Zero(), m_PosZeroFP())))
+    return nullptr;
+
+  Value *DataVec;
+  DataVec = LHS;
+  if (LHSZero)
+    DataVec = RHS;
+
+  ArrayRef<int> Mask = SVI.getShuffleMask();
+  int NumElts = Mask.size();
+
+  SmallVector<int, 16> NewMask(Mask.size(), NumElts);
+  NewMask[0] = 0;
+  // Check it is not already canonical
+  if (!LHSZero && match(Mask, m_SpecificMask(NewMask)))
+    return nullptr;
+
+  // We must have a non-zero at lane 0
+  int ExpectedDataIndex = LHSZero ? NumElts : 0;
+  if (Mask[0] != ExpectedDataIndex)
+    return nullptr;
+
+  // Check all that all other lanes select zero
+  for (size_t i = 1; i < Mask.size(); ++i) {
+    if (Mask[i] < 0)
+      return nullptr;
+
+    bool SelectsZero =
+        LHSZero ? Mask[i] < int(NumElts) : Mask[i] >= int(NumElts);
+    if (!SelectsZero) {
+      return nullptr;
+    }
+  }
+
+  auto *VT = cast<FixedVectorType>(LHS->getType());
+  auto *NullVec = Constant::getNullValue(VT);
+  return new ShuffleVectorInst(DataVec, NullVec, NewMask);
+}
+
 // Splatting the first element of the result of a BinOp, where any of the
 // BinOp's operands are the result of a first element splat can be simplified to
 // splatting the first element of the result of the BinOp
@@ -3067,6 +3111,9 @@ Instruction *InstCombinerImpl::visitShuffleVectorInst(ShuffleVectorInst &SVI) {
     SVI.commute();
     return &SVI;
   }
+
+  if (Instruction *I = canonicalizeClearUpperLanes(SVI))
+    return I;
 
   if (Instruction *I = canonicalizeInsertSplat(SVI, Builder))
     return I;
