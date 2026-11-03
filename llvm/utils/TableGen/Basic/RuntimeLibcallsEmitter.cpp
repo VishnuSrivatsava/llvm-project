@@ -553,7 +553,7 @@ const uint16_t RTLIB::RuntimeLibcallsInfo::SignatureOffset[] = {
 }
 
 using AttrNames = std::vector<StringRef>;
-using ArgAttrEntry = std::tuple<unsigned, unsigned, StringRef>;
+using ArgAttrEntry = std::tuple<unsigned, unsigned, StringRef, bool>;
 
 static AttrNames getAttrNames(const Record *R, const ListInit *L,
                               StringRef Kind) {
@@ -651,6 +651,7 @@ void RuntimeLibcallEmitter::emitRuntimeLibcallAttributes(
     const ListInit *ParamAttrs = R->getValueAsListInit("ParamAttrs");
     std::vector<const Record *> ParamPointeeTypes =
         R->getValueAsListOfDefs("ParamPointeeTypes");
+    bool AlignToElement = R->getValueAsBit("AlignPointeesToElementType");
 
     if (ParamAttrs->size() > ArgTypes.size()) {
       PrintFatalError(R, "ParamAttrs has " + Twine(ParamAttrs->size()) +
@@ -693,7 +694,8 @@ void RuntimeLibcallEmitter::emitRuntimeLibcallAttributes(
         continue;
 
       ArgAttrSeq.emplace_back(ArgNo, ArgAttrSets.add(std::move(Attrs)),
-                              PointeeType);
+                              PointeeType,
+                              !PointeeType.empty() && AlignToElement);
     }
 
     ImplAttrIDs.emplace_back(FnAttrSetID,
@@ -727,13 +729,15 @@ void RuntimeLibcallEmitter::emitRuntimeLibcallAttributes(
         "  uint8_t ArgNo;\n"
      << "  " << getMinimalUIntType(ArgAttrSets.size()) << " AttrSetID;\n"
      << "  RTLIB::FuncArgTypeID PointeeType;\n"
+        "  bool AlignToElement;\n"
         "};\n"
         "} // namespace\n\n"
         "static constexpr LibcallArgAttrs LibcallArgAttrTable[] = {\n";
   ArgAttrSeqs.emitEntries(OS, [](raw_ostream &OS, ArgAttrEntry Entry) {
-    auto [ArgNo, SetID, PointeeType] = Entry;
-    OS << formatv("{{{}, {}, RTLIB::{}}", ArgNo, SetID,
-                  PointeeType.empty() ? "NoFuncArgType" : PointeeType);
+    auto [ArgNo, SetID, PointeeType, AlignToElement] = Entry;
+    OS << formatv("{{{}, {}, RTLIB::{}, {}}", ArgNo, SetID,
+                  PointeeType.empty() ? "NoFuncArgType" : PointeeType,
+                  AlignToElement);
   });
   OS << "};\n\n";
 
